@@ -42,8 +42,11 @@
 ## セットアップ
 
 ```bash
+# リポジトリをクローン
+git clone git@github.com:0okb/terminal_canvas.git
+cd terminal_canvas
+
 # 依存関係のインストール
-cd console-canvas
 npm install
 
 # 開発モードで起動
