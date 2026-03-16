@@ -58,19 +58,13 @@ impl PtyManager {
             .openpty(pty_size)
             .map_err(|e| format!("Failed to open PTY: {}", e))?;
 
-        let shell_path = shell.unwrap_or_else(|| {
-            std::env::var("SHELL").unwrap_or_else(|_| "/bin/zsh".to_string())
-        });
+        let shell_path = shell.unwrap_or_else(|| crate::platform::default_shell());
 
         let mut cmd = CommandBuilder::new(&shell_path);
+        #[cfg(unix)]
         cmd.arg("-l"); // login shell
         if let Some(ref dir) = cwd {
-            let expanded = if dir.starts_with('~') {
-                let home = std::env::var("HOME").unwrap_or_else(|_| "/tmp".into());
-                dir.replacen('~', &home, 1)
-            } else {
-                dir.clone()
-            };
+            let expanded = crate::platform::expand_tilde(dir);
             if !expanded.is_empty() {
                 cmd.cwd(&expanded);
             }

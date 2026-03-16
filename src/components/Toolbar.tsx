@@ -1,8 +1,7 @@
 import { createSignal, For, Show, onCleanup } from "solid-js";
 import { invoke } from "@tauri-apps/api/core";
-import { addTerminal, terminals, totalCost } from "../stores/terminalStore";
+import { addTerminal, terminals } from "../stores/terminalStore";
 import { zoom, resetView } from "../stores/canvasStore";
-import { timelineVisible, toggleTimeline } from "../stores/timelineStore";
 
 export default function Toolbar() {
   const [showRecent, setShowRecent] = createSignal(false);
@@ -51,7 +50,6 @@ export default function Toolbar() {
     }
   }
 
-  // Close dropdown when clicking outside
   function handleGlobalClick(e: MouseEvent) {
     const target = e.target as HTMLElement;
     if (!target.closest(".recent-dropdown-wrapper")) {
@@ -63,13 +61,12 @@ export default function Toolbar() {
   onCleanup(() => document.removeEventListener("click", handleGlobalClick));
 
   function shortenPath(p: string): string {
-    const home = "/Users/";
-    if (p.startsWith(home)) {
-      const rest = p.slice(home.length);
-      const slashIdx = rest.indexOf("/");
-      if (slashIdx !== -1) {
-        return "~" + rest.slice(slashIdx);
-      }
+    const norm = p.replace(/\\/g, "/");
+    const match = norm.match(/^(?:[A-Z]:)?\/(?:Users|home)\/[^/]+\/(.*)/i);
+    if (match) {
+      return "~/" + match[1];
+    }
+    if (/^(?:[A-Z]:)?\/(?:Users|home)\/[^/]+\/?$/i.test(norm)) {
       return "~";
     }
     return p;
@@ -103,21 +100,7 @@ export default function Toolbar() {
         </Show>
       </div>
 
-      <span class="toolbar-separator" />
-
-      <button
-        class="toolbar-btn"
-        classList={{ "toolbar-btn-active": timelineVisible() }}
-        onClick={toggleTimeline}
-      >
-        Timeline
-      </button>
-
       <div class="toolbar-spacer" />
-
-      <Show when={totalCost() > 0}>
-        <span class="toolbar-cost">Total: ${totalCost().toFixed(4)}</span>
-      </Show>
 
       <span class="toolbar-zoom">{Math.round(zoom() * 100)}%</span>
       <button class="toolbar-btn" onClick={resetView}>

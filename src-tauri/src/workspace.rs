@@ -25,21 +25,7 @@ pub struct WorkspaceData {
 }
 
 fn workspace_path() -> PathBuf {
-    let home = std::env::var("HOME").unwrap_or_else(|_| "/tmp".into());
-    #[cfg(target_os = "macos")]
-    let config = PathBuf::from(&home)
-        .join("Library")
-        .join("Application Support")
-        .join("terminal-canvas");
-    #[cfg(target_os = "windows")]
-    let config = std::env::var("APPDATA")
-        .map(PathBuf::from)
-        .unwrap_or_else(|_| PathBuf::from("C:\\"))
-        .join("terminal-canvas");
-    #[cfg(target_os = "linux")]
-    let config = PathBuf::from(&home).join(".config").join("terminal-canvas");
-
-    config.join("workspace.json")
+    crate::platform::config_dir().join("workspace.json")
 }
 
 pub fn save(data: &WorkspaceData) -> Result<(), String> {

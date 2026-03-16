@@ -48,25 +48,12 @@ pub struct UiColors {
     pub close_button_text: String,
     pub close_button_hover: String,
     pub resize_handle: String,
-    pub statusbar_background: String,
-    pub statusbar_text: String,
-}
-
-#[derive(Clone, Serialize, Deserialize)]
-pub struct StatusColors {
-    pub idle: String,
-    pub thinking: String,
-    pub tool_running: String,
-    pub permission: String,
-    pub error: String,
-    pub completed: String,
 }
 
 #[derive(Clone, Serialize, Deserialize)]
 pub struct Theme {
     pub terminal: TerminalColors,
     pub ui: UiColors,
-    pub status: StatusColors,
 }
 
 impl Default for Theme {
@@ -115,43 +102,13 @@ impl Default for Theme {
                 close_button_text: "#888888".into(),
                 close_button_hover: "#ffffff".into(),
                 resize_handle: "#444444".into(),
-                statusbar_background: "#0a0a0a".into(),
-                statusbar_text: "#888888".into(),
-            },
-            status: StatusColors {
-                idle: "#555555".into(),
-                thinking: "#f0c674".into(),
-                tool_running: "#81a2be".into(),
-                permission: "#cc6666".into(),
-                error: "#a54242".into(),
-                completed: "#8c9440".into(),
             },
         }
     }
 }
 
 fn theme_path() -> PathBuf {
-    let config_dir = dirs_config_dir().join("terminal-canvas");
-    config_dir.join("theme.json")
-}
-
-fn dirs_config_dir() -> PathBuf {
-    #[cfg(target_os = "macos")]
-    {
-        let home = std::env::var("HOME").unwrap_or_else(|_| "/tmp".into());
-        PathBuf::from(home).join("Library").join("Application Support")
-    }
-    #[cfg(target_os = "windows")]
-    {
-        std::env::var("APPDATA")
-            .map(PathBuf::from)
-            .unwrap_or_else(|_| PathBuf::from("C:\\"))
-    }
-    #[cfg(target_os = "linux")]
-    {
-        let home = std::env::var("HOME").unwrap_or_else(|_| "/tmp".into());
-        PathBuf::from(home).join(".config")
-    }
+    crate::platform::config_dir().join("theme.json")
 }
 
 pub fn load_theme() -> Theme {
@@ -165,7 +122,6 @@ pub fn load_theme() -> Theme {
             Err(e) => eprintln!("Failed to read theme.json: {}. Using defaults.", e),
         }
     } else {
-        // Create default theme file so user can edit it
         if let Some(parent) = path.parent() {
             let _ = fs::create_dir_all(parent);
         }

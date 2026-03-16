@@ -9,9 +9,19 @@ import {
   removeTerminal,
 } from "../stores/terminalStore";
 import { zoom } from "../stores/canvasStore";
-import { theme } from "../stores/themeStore";
-import { STATUS_LABELS } from "../statusDetector";
 import type { TerminalPaneData } from "../types";
+
+const STATUS_COLORS: Record<string, string> = {
+  idle: "#555555",
+  running: "#f0c674",
+  permission: "#cc6666",
+};
+
+const STATUS_LABELS: Record<string, string> = {
+  idle: "Idle",
+  running: "Running",
+  permission: "Awaiting Permission",
+};
 
 interface TerminalPaneProps {
   data: TerminalPaneData;
@@ -28,24 +38,8 @@ export default function TerminalPane(props: TerminalPaneProps) {
   let initialH = 0;
 
   const isActive = () => activeTerminalId() === props.data.id;
-
-  const statusColor = () => {
-    const colors = theme().status;
-    return colors[props.data.status] ?? colors.idle;
-  };
-
-  const statusLabel = () => {
-    const base = STATUS_LABELS[props.data.status] ?? "Unknown";
-    if (props.data.status === "tool_running" && props.data.statusDetail) {
-      return `${base}: ${props.data.statusDetail}`;
-    }
-    return base;
-  };
-
-  const isAnimated = () =>
-    props.data.status === "thinking" ||
-    props.data.status === "tool_running" ||
-    props.data.status === "permission";
+  const statusColor = () => STATUS_COLORS[props.data.status] ?? STATUS_COLORS.idle;
+  const statusLabel = () => STATUS_LABELS[props.data.status] ?? "Idle";
 
   function handleTitleMouseDown(e: MouseEvent) {
     if (e.button !== 0) return;
@@ -110,7 +104,11 @@ export default function TerminalPane(props: TerminalPaneProps) {
   return (
     <div
       class="terminal-pane"
-      classList={{ active: isActive(), "status-pulse": isAnimated() }}
+      classList={{
+        active: isActive(),
+        "status-running": props.data.status === "running",
+        "status-permission": props.data.status === "permission",
+      }}
       style={{
         position: "absolute",
         left: `${props.data.x}px`,
@@ -121,29 +119,22 @@ export default function TerminalPane(props: TerminalPaneProps) {
       }}
       onMouseDown={handlePaneClick}
     >
-      {/* Title bar */}
       <div class="terminal-titlebar" onMouseDown={handleTitleMouseDown}>
         <span class="terminal-title">{props.data.title}</span>
-        <button class="terminal-close" onClick={handleClose}>
-          x
-        </button>
+        <div class="terminal-titlebar-right">
+          <span class="terminal-status-badge" style={{ background: statusColor() }}>
+            {statusLabel()}
+          </span>
+          <button class="terminal-close" onClick={handleClose}>
+            x
+          </button>
+        </div>
       </div>
 
-      {/* Terminal content */}
       <div class="terminal-content">
         <TerminalView ptyId={props.data.ptyId} terminalId={props.data.id} />
       </div>
 
-      {/* Status bar */}
-      <div class="terminal-statusbar" style={{ "border-top-color": statusColor() }}>
-        <span class="status-indicator" style={{ background: statusColor() }} />
-        <span class="status-label">{statusLabel()}</span>
-        {props.data.cost > 0 && (
-          <span class="status-cost">${props.data.cost.toFixed(4)}</span>
-        )}
-      </div>
-
-      {/* Resize handle */}
       <div class="terminal-resize-handle" onMouseDown={handleResizeMouseDown} />
     </div>
   );

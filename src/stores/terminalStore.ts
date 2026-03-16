@@ -1,7 +1,6 @@
 import { createSignal } from "solid-js";
 import { createStore, produce } from "solid-js/store";
-import type { ClaudeStatus, TerminalPaneData } from "../types";
-import { recordStatusChange } from "./timelineStore";
+import type { TerminalPaneData, TerminalStatus } from "../types";
 
 let nextId = 1;
 
@@ -21,9 +20,7 @@ function addTerminal(ptyId: number, x: number, y: number, opts?: { width?: numbe
         height: opts?.height ?? 400,
         title: `Terminal ${ptyId}`,
         cwd: "",
-        status: "idle" as ClaudeStatus,
-        statusDetail: "",
-        cost: 0,
+        status: "idle" as TerminalStatus,
       });
     })
   );
@@ -69,33 +66,13 @@ function updateTerminalCwd(id: string, cwd: string) {
   );
 }
 
-function updateTerminalStatus(id: string, status: ClaudeStatus, detail?: string) {
-  // Find current status to check if changed
-  const terminal = terminals.find((t) => t.id === id);
-  if (terminal && terminal.status !== status) {
-    recordStatusChange(id, status);
-  }
-
+function updateTerminalStatus(id: string, status: TerminalStatus) {
   setTerminals(
     (t) => t.id === id,
     produce((t) => {
       t.status = status;
-      t.statusDetail = detail ?? "";
     })
   );
-}
-
-function updateTerminalCost(id: string, cost: number) {
-  setTerminals(
-    (t) => t.id === id,
-    produce((t) => {
-      t.cost = cost;
-    })
-  );
-}
-
-function totalCost(): number {
-  return terminals.reduce((sum, t) => sum + t.cost, 0);
 }
 
 function removeTerminal(id: string) {
@@ -120,8 +97,6 @@ export {
   updateTerminalTitle,
   updateTerminalCwd,
   updateTerminalStatus,
-  updateTerminalCost,
-  totalCost,
   removeTerminal,
   clearAllTerminals,
 };

@@ -1,10 +1,4 @@
-export type ClaudeStatus =
-  | "idle"
-  | "thinking"
-  | "tool_running"
-  | "permission"
-  | "error"
-  | "completed";
+export type TerminalStatus = "idle" | "running" | "permission";
 
 export interface TerminalPaneData {
   id: string;
@@ -15,15 +9,7 @@ export interface TerminalPaneData {
   height: number;
   title: string;
   cwd: string;
-  status: ClaudeStatus;
-  statusDetail: string;
-  cost: number;
-}
-
-export interface CanvasState {
-  panX: number;
-  panY: number;
-  zoom: number;
+  status: TerminalStatus;
 }
 
 export interface PtyOutput {
@@ -39,16 +25,8 @@ export interface PtyExit {
 export interface ClaudeStatusEvent {
   session_id: string;
   status: string;
-  tool_name: string;
   cwd: string;
   timestamp: number;
-  cost: number;
-}
-
-export interface TimelineEntry {
-  status: ClaudeStatus;
-  startTime: number;
-  endTime: number | null;
 }
 
 export interface WorkspaceTerminal {
@@ -95,15 +73,6 @@ export interface TerminalColors {
   bright_white: string;
 }
 
-export interface StatusColors {
-  idle: string;
-  thinking: string;
-  tool_running: string;
-  permission: string;
-  error: string;
-  completed: string;
-}
-
 export interface UiColors {
   app_background: string;
   toolbar_background: string;
@@ -123,12 +92,9 @@ export interface UiColors {
   close_button_text: string;
   close_button_hover: string;
   resize_handle: string;
-  statusbar_background: string;
-  statusbar_text: string;
 }
 
 export interface Theme {
   terminal: TerminalColors;
   ui: UiColors;
-  status: StatusColors;
 }

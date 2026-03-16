@@ -2,11 +2,9 @@ import { onMount, onCleanup, Show } from "solid-js";
 import { invoke } from "@tauri-apps/api/core";
 import Canvas from "./components/Canvas";
 import Toolbar from "./components/Toolbar";
-import TimelinePanel from "./components/TimelinePanel";
 import { theme, themeLoaded, loadTheme, applyUiTheme } from "./stores/themeStore";
 import { terminals, addTerminal } from "./stores/terminalStore";
 import { panX, panY, zoom, setPanX, setPanY, setZoom } from "./stores/canvasStore";
-import { timelineVisible } from "./stores/timelineStore";
 import type { WorkspaceData } from "./types";
 import "./App.css";
 
@@ -57,7 +55,6 @@ function App() {
       invoke("save_workspace", { data }).catch(() => {});
     }, 30000);
 
-    // Save on window close
     window.addEventListener("beforeunload", saveWorkspaceSync);
   });
 
@@ -86,9 +83,6 @@ function App() {
       <div class="app">
         <Toolbar />
         <Canvas />
-        <Show when={timelineVisible()}>
-          <TimelinePanel />
-        </Show>
       </div>
     </Show>
   );

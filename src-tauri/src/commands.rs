@@ -49,11 +49,6 @@ pub fn get_theme() -> Theme {
 }
 
 #[tauri::command]
-pub fn setup_claude_hooks() -> Result<String, String> {
-    crate::hooks::setup_hooks()
-}
-
-#[tauri::command]
 pub fn get_recent_directories() -> Vec<String> {
     history::load_history()
 }

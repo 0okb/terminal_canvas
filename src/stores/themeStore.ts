@@ -46,16 +46,6 @@ const defaultTheme: Theme = {
     close_button_text: "#888888",
     close_button_hover: "#ffffff",
     resize_handle: "#444444",
-    statusbar_background: "#0a0a0a",
-    statusbar_text: "#888888",
-  },
-  status: {
-    idle: "#555555",
-    thinking: "#f0c674",
-    tool_running: "#81a2be",
-    permission: "#cc6666",
-    error: "#a54242",
-    completed: "#8c9440",
   },
 };
 
@@ -92,8 +82,6 @@ function applyUiTheme(ui: Theme["ui"]) {
   root.style.setProperty("--close-btn-text", ui.close_button_text);
   root.style.setProperty("--close-btn-hover", ui.close_button_hover);
   root.style.setProperty("--resize-handle", ui.resize_handle);
-  root.style.setProperty("--statusbar-bg", ui.statusbar_background);
-  root.style.setProperty("--statusbar-text", ui.statusbar_text);
 }
 
 export { theme, themeLoaded, loadTheme, applyUiTheme };

@@ -1,6 +1,7 @@
 mod commands;
 mod history;
 mod hooks;
+pub mod platform;
 mod pty_manager;
 mod theme;
 mod workspace;
@@ -18,7 +19,6 @@ pub fn run() {
             commands::resize_pty,
             commands::close_pty,
             commands::get_theme,
-            commands::setup_claude_hooks,
             commands::get_recent_directories,
             commands::add_recent_directory,
             commands::save_workspace,
